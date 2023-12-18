@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vision Chess Online</title>
+    <link href="style.css" rel="stylesheet" type="text/css">
+    <script src="chess.js"></script>
+    <script src="ux.js"></script>
+</head>
+	
+<body style="background: #36393f">
+	<div class="tab" style="width: 25%;">
+		<h3>Board Settings</h3>
+		
+		<br>
+		<input id="checkbox_flip" type="checkbox" onchange="checkflip()">
+		<label for="checkbox_flip" style="user-select: none;">Flip board</label>
+
+		<br>
+		
+		<button onclick="ux_undo()">Undo Move</button>
+		<br>
+		
+		<label for="fen">fen</label>
+		<input id="fen" style="width:80%; overflow: auto;" onchange="set_board_fen(document.getElementById('fen').value)"></input>
+
+		<br>
+		<br>
+		<br>
+		<h3>Engine Settings</h3>
+		
+		<br>
+			
+		<label for="thinktime">thinktime (in ms)</label>
+		<input id="thinktime" style="width:30%; overflow: auto;" type="number" value="3000"></input>
+
+		<br>
+		<input id="checkbox_play" type="checkbox" onchange="checkplay()">
+		<label for="checkbox_play" style="user-select: none;">Play mode</label>
+		<br>
+		<input id="checkbox_think" type="checkbox" onchange="checkthink()">
+		<label for="checkbox_think" style="user-select: none;">Think</label>
+		<br>
+		<input id="checkbox_arrow" type="checkbox" onchange="checkarrow()">
+		<label for="checkbox_arrow" style="user-select: none;">Show best move</label>
+		<br>
+		<input id="checkbox_output" type="checkbox" onchange="checkoutput()">
+		<label for="checkbox_output" style="user-select: none;">Show engine output</label>
+
+		
+		<div class="output">Engine Output</div>
+		<div class="output" id="output" style="height: 80%"></div>
+	</div>
+	<div class="tab" style="width:70%">
+	    <div class="board" id="board">
+			<div class="square" style="background: #2a4a2f;" id="square01"></div>
+			<div class="square" style="background: #5bb081;" id="square02"></div>
+			<div class="square" style="background: #2a4a2f;" id="square03"></div>
+			<div class="square" style="background: #5bb081;" id="square04"></div>
+			<div class="square" style="background: #2a4a2f;" id="square05"></div>
+			<div class="square" style="background: #5bb081;" id="square06"></div>
+			<div class="square" style="background: #2a4a2f;" id="square07"></div>
+			<div class="square" style="background: #5bb081;" id="square08"></div>
+			<div class="square" style="background: #5bb081;" id="square09"></div>
+			<div class="square" style="background: #2a4a2f;" id="square10"></div>
+			<div class="square" style="background: #5bb081;" id="square11"></div>
+			<div class="square" style="background: #2a4a2f;" id="square12"></div>
+			<div class="square" style="background: #5bb081;" id="square13"></div>
+			<div class="square" style="background: #2a4a2f;" id="square14"></div>
+			<div class="square" style="background: #5bb081;" id="square15"></div>
+			<div class="square" style="background: #2a4a2f;" id="square16"></div>
+			<div class="square" style="background: #2a4a2f;" id="square17"></div>
+			<div class="square" style="background: #5bb081;" id="square18"></div>
+			<div class="square" style="background: #2a4a2f;" id="square19"></div>
+			<div class="square" style="background: #5bb081;" id="square20"></div>
+			<div class="square" style="background: #2a4a2f;" id="square21"></div>
+			<div class="square" style="background: #5bb081;" id="square22"></div>
+			<div class="square" style="background: #2a4a2f;" id="square23"></div>
+			<div class="square" style="background: #5bb081;" id="square24"></div>
+			<div class="square" style="background: #5bb081;" id="square25"></div>
+			<div class="square" style="background: #2a4a2f;" id="square26"></div>
+			<div class="square" style="background: #5bb081;" id="square27"></div>
+			<div class="square" style="background: #2a4a2f;" id="square28"></div>
+			<div class="square" style="background: #5bb081;" id="square29"></div>
+			<div class="square" style="background: #2a4a2f;" id="square30"></div>
+			<div class="square" style="background: #5bb081;" id="square31"></div>
+			<div class="square" style="background: #2a4a2f;" id="square32"></div>
+			<div class="square" style="background: #2a4a2f;" id="square33"></div>
+			<div class="square" style="background: #5bb081;" id="square34"></div>
+			<div class="square" style="background: #2a4a2f;" id="square35"></div>
+			<div class="square" style="background: #5bb081;" id="square36"></div>
+			<div class="square" style="background: #2a4a2f;" id="square37"></div>
+			<div class="square" style="background: #5bb081;" id="square38"></div>
+			<div class="square" style="background: #2a4a2f;" id="square39"></div>
+			<div class="square" style="background: #5bb081;" id="square40"></div>
+			<div class="square" style="background: #5bb081;" id="square41"></div>
+			<div class="square" style="background: #2a4a2f;" id="square42"></div>
+			<div class="square" style="background: #5bb081;" id="square43"></div>
+			<div class="square" style="background: #2a4a2f;" id="square44"></div>
+			<div class="square" style="background: #5bb081;" id="square45"></div>
+			<div class="square" style="background: #2a4a2f;" id="square46"></div>
+			<div class="square" style="background: #5bb081;" id="square47"></div>
+			<div class="square" style="background: #2a4a2f;" id="square48"></div>
+			<div class="square" style="background: #2a4a2f;" id="square49"></div>
+			<div class="square" style="background: #5bb081;" id="square50"></div>
+			<div class="square" style="background: #2a4a2f;" id="square51"></div>
+			<div class="square" style="background: #5bb081;" id="square52"></div>
+			<div class="square" style="background: #2a4a2f;" id="square53"></div>
+			<div class="square" style="background: #5bb081;" id="square54"></div>
+			<div class="square" style="background: #2a4a2f;" id="square55"></div>
+			<div class="square" style="background: #5bb081;" id="square56"></div>
+			<div class="square" style="background: #5bb081;" id="square57"></div>
+			<div class="square" style="background: #2a4a2f;" id="square58"></div>
+			<div class="square" style="background: #5bb081;" id="square59"></div>
+			<div class="square" style="background: #2a4a2f;" id="square60"></div>
+			<div class="square" style="background: #5bb081;" id="square61"></div>
+			<div class="square" style="background: #2a4a2f;" id="square62"></div>
+			<div class="square" style="background: #5bb081;" id="square63"></div>
+			<div class="square" style="background: #2a4a2f;" id="square64"></div>
+	    </div>
+	</div>
+
+</body>
+</html>
