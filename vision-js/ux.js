@@ -48,6 +48,7 @@ window.onload = function() {
 	checkthink();
 	checkoutput();
 	checkarrow();
+	checkplay();
 }
 
 window.onresize = function() {
