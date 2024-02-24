@@ -16,32 +16,20 @@
 			</header>
 			<div id="main">
 				<div class="inner">
-					<h1 style="text-align: center;">Text Generator</h1>							  
+					<h1 style="text-align: center;">Vision Chess</h1>							  
 					<span class="image main">
-						<video width="720" height="720" autoplay muted loop style="margin: auto; display: block;">
-							<source src="videos/text_generation.mp4" type="video/mp4"/>
+						<video width="480" height="480" autoplay muted loop style="margin: auto; display: block;">
+							<source src="videos/game.mp4" type="video/mp4"/>
 						</video>
-						<p style="text-align: center;">The above video shows my project generating text given the seed prompt <br> "I believe the meaning of life is," although I admit the output is nonsensical <br> and instead resembles the Shakespearean plays the model was trained on. </h4>
+						<p style="text-align: center;">The above video shows a game played <br> by Vision Chess against itself with very <br> low time control. </p>
 					</span>
-					<h3>What it does</h3>
-					<p>I developed Vision, a UCI (Universal Chess Interface) compatible chess engine capable of analyzing any given chess position to predict the best move and winning chances using a mini-max style search tree with iterative deepening and alpha-beta pruning.</p>
-					<h3>Tools used</h3>
-					<ul>
-						<li>Python</li>
-						<li>Pytorch</li>
-						<li>Jupyter Notebooks</li>
-						<li>CUDA</li>
-					</ul>
-					<h3>Links</h3>
-					<a href="https://github.com/kawgit/Vision-Chess"><img src="images\link_icon.png" style="width:20px; height:auto; display:inline;">  Source code</a> <br>
-					<a href="vision-js\index.html"><img src="images\link_icon.png" style="width:20px; height:auto; display:inline;">  Javascript/HTML/CSS version (you can play it in your browser!)</a>
-					<br>
-					<br>
-					<h3>How it works</h3>
-					<p>For a given position, it starts with a search of depth 1, and records what it learns (e.g. winning chances or best moves) about each position it encounters in a hash table. It then searches with depth 2, using information from the hash table to speed up its search, for example by searching better moves before worse moves.  </p>
-					<p>It efficiently computes legal moves for positions using bitboards, bit-manipulation, and magic hashing (hash functions made with magic numbers which are found through brute force, made to take advantage of hash collisions). </p>
-					<p>Currently, it uses a hand-crafted evaluation to evaluate the winning chances of positions, but will soon switch to a neural network based implementation.</p>
-					<p>I also developed a version in Javascript, which you can play against in your browser through link in the link section of this page.</p>
+					<div style="background-color: black; margin-left: 20%; margin-right: 20%;">
+						<p style="margin-left: 5px; margin-right:5px; ">I am the sole developer of Vision, a chess engine capable of analyzing any given chess position to predict the best move and winning chances using a mini-max style search tree with iterative deepening and alpha-beta pruning. </p>
+						<p style="margin-left: 5px; margin-right:5px; ">For a given position, it will continuously explore the game tree recording, what it learns (winning chances and best moves) about each position it visits in a hash table. It explores the game tree selectively, prioritizing moves like checks, captures, promotions or other moves which heuristically likely to be best. Similarly, it spends little time considering moves which are not likely to be good. </p>
+						<p style="margin-left: 5px; margin-right:5px; ">It efficiently computes legal moves for positions using bitboards and magic hashing (hash functions with magic numbers made to take advantage of hash collisions). </p>
+						<p style="margin-left: 5px; margin-right:5px; ">To estimate the winning chances for any given position encountered in the search tree, it uses a neural network trained by myself and a system to incrementally update the outputs of the first layer, rather than re-computing features for every new position. </p>
+						<p style="margin-left: 5px; margin-right:5px; ">If you want to try playing a demo, but don't want the hassle of building the C++ code from my Github, I have made a (simpler) Javascript version viewable as a webpage here: <a href="https://kawgit.github.io/vision-js">https://kawgit.github.io/vision-js.</a></p>
+					</div>
 				</div>
 			</div>
 		</div>
