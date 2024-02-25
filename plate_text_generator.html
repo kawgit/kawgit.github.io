@@ -27,8 +27,7 @@
 						<p style="margin-left: 5px; margin-right:5px;">I developed a PyTorch model to generate text trained on a dataset of Shakespeare plays using a small-scale version of the very same “self-attention” technique used by popular tools like ChatGPT and Bard.</p>
 						<p style="margin-left: 5px; margin-right:5px;">The tool generates text by predicting the next token (word or character) in a sequence of tokens. For each token in the input, three vectors of equal length are generated, respectively called the token's key, and query, and output vectors.  In essence, the query represents what a given token is interested in, the key what information that token has to offer. For any given pair of tokens, the amount of “interest” one token has with another is the dot product of one's query vector with the other's key vector.</p>
 						<p style="margin-left: 5px; margin-right:5px;">Once an interest level between every pair of tokens is calculated, the tokens “speak” to each other. Each token creates a new vector which is the sum of each of the other tokens' output vectors weighted by the “interest” between the pair.</p>
-						<p style="margin-left: 5px; margin-right:5px;">This is the essence of the unique technique that allows large language models to intake an arbitrarily sized sequence of tokens and process those tokens into features useful for predicting the next token in the input sequence.</p>
-						<p style="margin-left: 5px; margin-right:5px;"></p>
+						<p style="margin-left: 5px; margin-right:5px;">This is the unique technique that allows large language models to intake an arbitrarily sized sequence of tokens and create into features useful for predicting the next token in the input sequence.</p>
 					</div>
 				</div>
 			</div>
