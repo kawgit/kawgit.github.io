@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-SNJHNEYP5B"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+        
+          gtag('config', 'G-SNJHNEYP5B');
+        </script>
+		
     <title>Vision Chess Online</title>
     <link href="style.css" rel="stylesheet" type="text/css">
     <script src="chess.js"></script>
@@ -34,7 +44,7 @@
 		<input id="thinktime" style="width:30%; overflow: auto;" type="number" value="3000"></input>
 
 		<br>
-		<input id="checkbox_play" type="checkbox" onchange="checkplay()">
+		<input id="checkbox_play" type="checkbox" onchange="checkplay()" checked>
 		<label for="checkbox_play" style="user-select: none;">Play mode</label>
 		<br>
 		<input id="checkbox_think" type="checkbox" onchange="checkthink()">
