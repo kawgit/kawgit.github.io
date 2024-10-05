@@ -196,7 +196,7 @@ function updatePlayMode() {
     }
 }
 
-function executeMove(moveString) {
+function doMove(moveString) {
     clearBoard();
     pos.do_str_move(moveString);
     drawPosition(pos);
@@ -210,7 +210,7 @@ function playLoop() {
     if (checkedPlayMode && !isUserTurn()) {
         const moveString = lastEngineStat("bestmove");
         if (moveString) {
-            executeMove(moveString);
+            doMove(moveString);
         }
     }
 }
@@ -257,7 +257,7 @@ function dragPiece(event) {
         const toSquareIndex = toRow * 8 + toCol;
         const fromSquareString = squareIndexToString(fromSquareIndex);
         const toSquareString = squareIndexToString(toSquareIndex);
-        executeMove(fromSquareString + toSquareString);
+        doMove(fromSquareString + toSquareString);
     }
 
     document.addEventListener('mousemove', onMouseMove);
