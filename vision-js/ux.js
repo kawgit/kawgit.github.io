@@ -104,8 +104,6 @@ function dragPiece(pieceId) {
     }
 
     document.onmouseup = function(event) {
-		console.log("HIUEUIDA")
-
         pieceElement.classList.remove("grabbed");
         document.onmousemove = null;
         document.onmouseup = null;
