@@ -58,6 +58,7 @@ h3 {
     height: 60vw;
     background: purple;
     position: relative;
+    overflow: hidden; /* Ensure the board's content remains inside */
 }
 
 .square,
@@ -108,10 +109,6 @@ button {
 
 button:hover {
     background-color: #5a6bb2;
-}
-
-button:active {
-    transform: scale(0.98);
 }
 
 /* Input and Label Styling */

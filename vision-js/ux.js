@@ -96,20 +96,22 @@ function dragPiece(pieceId) {
     });
 
     const pieceElement = document.getElementById(pieceId);
-    pieceElement.classList.add("grabbed");
-
+	
     document.onmousemove = function(event) {
-        pieceElement.style.left = Math.round(event.clientX - boardElement.getBoundingClientRect().left) + "px";
-        pieceElement.style.top = Math.round(event.clientY - boardElement.getBoundingClientRect().top) + "px";
+		pieceElement.classList.add("grabbed");
+        pieceElement.style.marginLeft = Math.round(event.clientX - boardElement.getBoundingClientRect().left) + "px";
+        pieceElement.style.marginTop = Math.round(event.clientY - boardElement.getBoundingClientRect().top) + "px";
     }
 
     document.onmouseup = function(event) {
+		console.log("HIUEUIDA")
+
         pieceElement.classList.remove("grabbed");
         document.onmousemove = null;
         document.onmouseup = null;
 
-        let toCol = Math.floor((event.clientX - boardElement.getBoundingClientRect().left) / parseInt(boardElement.style.width) * 8);
-        let toRow = 7 - Math.floor((event.clientY - boardElement.getBoundingClientRect().top) / parseInt(boardElement.style.height) * 8);
+        let toCol = Math.floor((event.clientX - boardElement.getBoundingClientRect().left) / parseInt(boardElement.getBoundingClientRect().width) * 8);
+        let toRow = 7 - Math.floor((event.clientY - boardElement.getBoundingClientRect().top) / parseInt(boardElement.getBoundingClientRect().height) * 8);
 
         if (document.getElementById("checkbox_flip").checked) {
             toRow = 7 - toRow;
@@ -127,8 +129,9 @@ function clearBoard() {
 }
 
 function displayBoardPosition(position) {
-    for (let i = 0; i < 64; i++) {
-        let piece = position.mailboxes[i];
+	
+	for (let i = 0; i < 64; i++) {
+		let piece = position.mailboxes[i];
         if (piece !== PIECENONE) {
             let pieceElement = document.createElement("img");
             pieceElement.src = getPieceImagePath(piece);
