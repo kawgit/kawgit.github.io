@@ -601,11 +601,11 @@ body.light .header {
 }
 
 body.dark .logo {
-  filter: invert(97%) grayscale(100%) opacity(0.6);
+  filter: invert(90%) grayscale(100%) opacity(0.9);
 }
 
 body.light .logo {
-  filter: grayscale(100%) opacity(0.6);
+  filter: opacity(0.9);
 }
 
 /* --------------------------------- */
