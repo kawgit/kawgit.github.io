@@ -1,320 +1,278 @@
-let board = document.getElementById("board");
-let board_pos = new Pos;
+let boardElement = document.getElementById("board");
+let boardPosition = new Pos();
 
-function is_user_turn() {
-	return (!document.getElementById("checkbox_flip").checked && board_pos.turn == WHITE)
-		|| (document.getElementById("checkbox_flip").checked && board_pos.turn == BLACK);
+function isUserTurn() {
+    const flipChecked = document.getElementById("checkbox_flip").checked;
+    return (!flipChecked && boardPosition.turn === WHITE) ||
+           (flipChecked && boardPosition.turn === BLACK);
 }
 
-function ux_undo() {
-	if (board_pos.move_log.length != 0) {
-		board_pos.undo_move();
-		if (document.getElementById("checkbox_play").checked && !is_user_turn()) {
-			board_pos.undo_move();
-		}
-		clear_position();
-		display_position(board_pos);
-
-		request_engine_updpos();
-	}
+function undoMove() {
+    if (boardPosition.move_log.length !== 0) {
+        boardPosition.undo_move();
+        if (document.getElementById("checkbox_play").checked && !isUserTurn()) {
+            boardPosition.undo_move();
+        }
+        clearBoard();
+        displayBoardPosition(boardPosition);
+        updateEnginePosition();
+    }
 }
 
-function get_sq_element(sq) {
-    return document.getElementById("square" + (sq+1).toString().padStart(2, '0'));
+function getSquareElement(squareIndex) {
+    return document.getElementById("square" + (squareIndex + 1).toString().padStart(2, '0'));
 }
 
-function place_on_square(elem, sq) {
-    let c = sq % 8;
-    let r = Math.floor(sq / 8);
-	if (document.getElementById("checkbox_flip").checked) {
-		r = 7 - r;
-		c = 7 - c;
-	}
-    elem.style.marginLeft = (c/8*100 + 6.25).toString() + "%";
-    elem.style.marginTop = ((7-r)/8*100 + 6.25).toString() + "%";
+function placePieceOnSquare(element, squareIndex) {
+    let col = squareIndex % 8;
+    let row = Math.floor(squareIndex / 8);
+    if (document.getElementById("checkbox_flip").checked) {
+        row = 7 - row;
+        col = 7 - col;
+    }
+    element.style.marginLeft = (col / 8 * 100).toString() + "%";
+    element.style.marginTop = ((7 - row) / 8 * 100).toString() + "%";
 }
 
 window.onload = function() {
-	board = document.getElementById("board");
+    boardElement = document.getElementById("board");
 
-	window.onresize();
-    
-	for (let i = 0; i < 64; i++) {
-        place_on_square(get_sq_element(i), i);
-    }
-
-	display_position(board_pos);
-
-	checkthink();
-	checkoutput();
-	checkarrow();
-	checkplay();
-}
-
-window.onresize = function() {
-	let size = Math.floor(Math.min(board.parentElement.clientWidth, board.parentElement.clientHeight) * .9);
-	console.log(size);
-	board.style.width = size.toString() + "px";
-	board.style.height = size.toString() + "px";
-	board.style.marginLeft = -Math.floor(size/2).toString() + "px";
-	board.style.fontSize = Math.floor(size/12).toString() + "px";
-}
-
-function get_path(pc) { // CREDIT FOR IMAGES TO CHESS.COM
-	return "pieces/" + (((pc & WHITE) != 0) ? "w" : "b") + piece_to_char.get(pc).toLowerCase() + ".png";
-}
-
-let from_row = SQUARENONE;
-let from_col = SQUARENONE;
-
-function highlight_sq(sq, color="yellow", id="") {
-	let elem = document.createElement("div");
-	elem.classList.add("highlight");
-	elem.style.background=color;
-	elem.draggable = false;
-	elem.id = id;
-	board.appendChild(elem);
-	place_on_square(elem, sq);
-}
-
-function ux_do(move_str) {
-	clear_position();
-	board_pos.do_str_move(move_str);
-	display_position(board_pos);
-
-	request_engine_updpos();
-	if (!is_user_turn()) {
-		setTimeout(playloop, parseInt(document.getElementById("thinktime").value));
-	}
-}
-
-function drag_piece(id) {
-	from_col = Math.floor(parseFloat(document.getElementById(id).style.marginLeft)/100 * 8);
-	from_row = 7-Math.floor(parseFloat(document.getElementById(id).style.marginTop)/100 * 8);
-	if (document.getElementById("checkbox_flip").checked) {
-		from_row = 7 - from_row;
-		from_col = 7 - from_col;
-	}
-	let from = rc(from_row, from_col);
-	
-	let moves = board_pos.get_legal_moves();
-
-	for (let i in moves) {
-		if (get_from(moves[i]) == from) {
-			let to = get_to(moves[i]);
-			highlight_sq(to);
-		}
-	}
-	
-	document.onmousemove = function(event) {
-		document.getElementById(id).style.marginLeft = Math.round(event.clientX - board.getBoundingClientRect().left).toString() + "px";
-		document.getElementById(id).style.marginTop = Math.round(event.clientY - board.getBoundingClientRect().top).toString() + "px";
-	}
-	
-	document.onmouseup = function(event) {
-		let to_col = Math.floor(((event.clientX - board.getBoundingClientRect().left)/parseInt(board.style.width)) * 8);
-		let to_row = 7-Math.floor(((event.clientY - board.getBoundingClientRect().top)/parseInt(board.style.height)) * 8);
-		
-		if (document.getElementById("checkbox_flip").checked) {
-			to_row = 7 - to_row;
-			to_col = 7 - to_col;
-		}
-		
-		document.onmousemove = null;
-		document.onmouseup = null;
-		let to = rc(to_row, to_col);
-		
-		console.log("from: " + get_sq_SAN(from));
-		console.log("to:   " + get_sq_SAN(to));
-
-		ux_do(get_sq_SAN(from) + get_sq_SAN(to));
-	}
-}
-
-function clear_position() {
-	const pieces = document.querySelectorAll('.piece');
-	pieces.forEach(sq => {
-	  sq.remove();
-	});
-
-	const highlights = document.querySelectorAll('.highlight');
-	highlights.forEach(sq => {
-	  sq.remove();
-	});
-}
-
-function display_position(pos) {
     for (let i = 0; i < 64; i++) {
-		let pc = pos.mailboxes[i];
-		if (pc != PIECENONE) {
-			
-			let elem = document.createElement("img");
-			elem.src = get_path(pc);
-			elem.classList.add("piece");
-			elem.id = "piece" + i.toString().padStart(2, '0');
-			elem.onmousedown = function() { drag_piece(this.id); }
-			elem.draggable = false;
-			
-			board.appendChild(elem);
-			place_on_square(elem, i);
-		}
+        placePieceOnSquare(getSquareElement(i), i);
+    }
+
+    displayBoardPosition(boardPosition);
+    checkEngineThinking();
+    checkOutput();
+    checkArrowDisplay();
+    checkPlayMode();
+}
+
+function getPieceImagePath(piece) {
+    const pieceColor = (piece & WHITE) !== 0 ? "w" : "b";
+    return "pieces/" + pieceColor + piece_to_char.get(piece).toLowerCase() + ".png";
+}
+
+let fromRow = SQUARENONE;
+let fromCol = SQUARENONE;
+
+function highlightSquare(squareIndex, color = "yellow", id = "") {
+    let highlightElement = document.createElement("div");
+    highlightElement.classList.add("highlight");
+    highlightElement.style.background = color;
+    highlightElement.draggable = false;
+    highlightElement.id = id;
+    boardElement.appendChild(highlightElement);
+    placePieceOnSquare(highlightElement, squareIndex);
+}
+
+function executeMove(moveString) {
+    clearBoard();
+    boardPosition.do_str_move(moveString);
+    displayBoardPosition(boardPosition);
+    updateEnginePosition();
+    if (!isUserTurn()) {
+        setTimeout(playLoop, parseInt(document.getElementById("thinktime").value));
     }
 }
 
-function is_valid_fen(fen) {
-	
-	if (fen.split("/").length != 8) return false;
-	if (fen.split(" ").length != 6) return false;
+function dragPiece(pieceId) {
+    fromCol = Math.floor(parseFloat(document.getElementById(pieceId).style.marginLeft) / 100 * 8);
+    fromRow = 7 - Math.floor(parseFloat(document.getElementById(pieceId).style.marginTop) / 100 * 8);
 
-	let i = 0;
-	while (true) {
-		if (fen[i] == ' ') break;
-		
-		if (fen[i] == '/') {}
-		else if (fen.charCodeAt(i) >= 48 && fen.charCodeAt(i) <= 57) {}
-		else if (char_to_piece.get(fen[i]) != null) {}
-		else return false;
-		
-		i++;
-	}
+    if (document.getElementById("checkbox_flip").checked) {
+        fromRow = 7 - fromRow;
+        fromCol = 7 - fromCol;
+    }
 
-	return true;
+    let fromSquare = rc(fromRow, fromCol);
+    let legalMoves = boardPosition.get_legal_moves();
+
+    legalMoves.forEach(move => {
+        if (get_from(move) === fromSquare) {
+            let toSquare = get_to(move);
+            highlightSquare(toSquare);
+        }
+    });
+
+    const pieceElement = document.getElementById(pieceId);
+    pieceElement.classList.add("grabbed");
+
+    document.onmousemove = function(event) {
+        pieceElement.style.left = Math.round(event.clientX - boardElement.getBoundingClientRect().left) + "px";
+        pieceElement.style.top = Math.round(event.clientY - boardElement.getBoundingClientRect().top) + "px";
+    }
+
+    document.onmouseup = function(event) {
+        pieceElement.classList.remove("grabbed");
+        document.onmousemove = null;
+        document.onmouseup = null;
+
+        let toCol = Math.floor((event.clientX - boardElement.getBoundingClientRect().left) / parseInt(boardElement.style.width) * 8);
+        let toRow = 7 - Math.floor((event.clientY - boardElement.getBoundingClientRect().top) / parseInt(boardElement.style.height) * 8);
+
+        if (document.getElementById("checkbox_flip").checked) {
+            toRow = 7 - toRow;
+            toCol = 7 - toCol;
+        }
+
+        let toSquare = rc(toRow, toCol);
+        executeMove(get_sq_SAN(fromSquare) + get_sq_SAN(toSquare));
+    }
 }
 
-function set_board_fen(fen) {
-	if (!is_valid_fen(fen)) return;
-	
-	board_pos = new Pos(fen);
-	clear_position();
-	display_position(board_pos);
-
-	request_engine_newpos();
+function clearBoard() {
+    document.querySelectorAll('.piece').forEach(piece => piece.remove());
+    document.querySelectorAll('.highlight').forEach(highlight => highlight.remove());
 }
 
-function get_last_engine_out() {
-	return document.getElementById("output").innerHTML.split("<br>")[0];
+function displayBoardPosition(position) {
+    for (let i = 0; i < 64; i++) {
+        let piece = position.mailboxes[i];
+        if (piece !== PIECENONE) {
+            let pieceElement = document.createElement("img");
+            pieceElement.src = getPieceImagePath(piece);
+            pieceElement.classList.add("piece");
+            pieceElement.id = "piece" + i.toString().padStart(2, '0');
+            pieceElement.onmousedown = function() {
+                dragPiece(this.id);
+            }
+            pieceElement.draggable = false;
+            boardElement.appendChild(pieceElement);
+            placePieceOnSquare(pieceElement, i);
+        }
+    }
 }
 
-function get_last_engine_stat(token) {
-	let list = get_last_engine_out().split(" "); 
-	return list[list.indexOf(token)+1];
+function isValidFen(fen) {
+    const parts = fen.split(" ");
+    if (fen.split("/").length !== 8 || parts.length !== 6) return false;
+
+    for (let i = 0; i < fen.length; i++) {
+        const char = fen[i];
+        if (char === ' ') break;
+        if (char === '/' || (char >= '1' && char <= '8') || char_to_piece.get(char) != null) {
+            continue;
+        }
+        return false;
+    }
+    return true;
 }
 
-function str_to_sq(str) {
-	return rc(str.charCodeAt(1)-49, str.charCodeAt(0)-97);
+function setBoardFen(fen) {
+    if (!isValidFen(fen)) return;
+    boardPosition = new Pos(fen);
+    clearBoard();
+    displayBoardPosition(boardPosition);
+    requestNewEnginePosition();
 }
 
-function checkarrow() {
-	if (document.getElementById("arrow_start") != null) board.removeChild(document.getElementById("arrow_start"));
-	if (document.getElementById("arrow_end") != null) board.removeChild(document.getElementById("arrow_end"));
-
-	if (document.getElementById("checkbox_think").checked && document.getElementById("checkbox_arrow").checked) {
-
-		if (!document.getElementById("checkbox_play").checked || !is_user_turn()) {
-			
-			let movestr = get_last_engine_stat("bestmove");
-			
-			highlight_sq(str_to_sq(movestr.substring(0, 2)), "red", "arrow_start");
-			highlight_sq(str_to_sq(movestr.substring(2, 4)), "red", "arrow_end");
-		}
-	
-		window.requestAnimationFrame(checkarrow);
-	}
+function getLastEngineOutput() {
+    return document.getElementById("output").innerHTML.split("<br>")[0];
 }
 
-function checkthink() {
-	if (document.getElementById("checkbox_think").checked) {
-		request_engine_start();
-		checkarrow();
-	}
-	else {
-		request_engine_stop();
-	}
+function getLastEngineStat(token) {
+    let output = getLastEngineOutput().split(" ");
+    return output[output.indexOf(token) + 1];
 }
 
-function checkoutput() {
-	if (document.getElementById("checkbox_output").checked) {
-		document.getElementById("output").style.visibility = "visible";
-	}
-	else {
-		document.getElementById("output").style.visibility = "hidden";
-	}
+function strToSquare(squareString) {
+    return rc(squareString.charCodeAt(1) - 49, squareString.charCodeAt(0) - 97);
 }
 
-function checkplay() {
-	if (document.getElementById("checkbox_play").checked) {
-		document.getElementById("checkbox_arrow").style.visibility = "hidden";
-		document.getElementById("checkbox_think").style.visibility = "hidden";
-		document.getElementById("checkbox_output").style.visibility = "hidden";
-		document.getElementById("checkbox_flip").style.visibility = "hidden";
-		document.getElementById("fen").style.visibility = "hidden";
+function checkArrowDisplay() {
+    ["arrow_start", "arrow_end"].forEach(id => {
+        const arrowElem = document.getElementById(id);
+        if (arrowElem) boardElement.removeChild(arrowElem);
+    });
 
-		document.getElementById("output").style.visibility = "hidden";
-
-		document.getElementById("checkbox_think").checked = true;
-		document.getElementById("checkbox_arrow").checked = true;
-		checkarrow();
-		checkthink();
-
-		if (!is_user_turn()) setTimeout(playloop(), parseInt(document.getElementById("thinktime").value));
-	}
-	else {
-		document.getElementById("checkbox_arrow").style.visibility = "visible";
-		document.getElementById("checkbox_think").style.visibility = "visible";
-		document.getElementById("checkbox_output").style.visibility = "visible";
-		document.getElementById("checkbox_flip").style.visibility = "visible";
-		document.getElementById("fen").style.visibility = "visible";
-		
-		checkoutput();
-		checkthink();
-		checkarrow();
-	}
+    if (document.getElementById("checkbox_think").checked && document.getElementById("checkbox_arrow").checked) {
+        if (!document.getElementById("checkbox_play").checked || !isUserTurn()) {
+            const moveString = getLastEngineStat("bestmove");
+            highlightSquare(strToSquare(moveString.substring(0, 2)), "red", "arrow_start");
+            highlightSquare(strToSquare(moveString.substring(2, 4)), "red", "arrow_end");
+        }
+        window.requestAnimationFrame(checkArrowDisplay);
+    }
 }
 
-function playloop() {
-	if (document.getElementById("checkbox_play").checked && !is_user_turn()) {
-
-		let movestr = get_last_engine_stat("bestmove");
-		ux_do(movestr);
-	}
+function checkEngineThinking() {
+    if (document.getElementById("checkbox_think").checked) {
+        requestEngineStart();
+        checkArrowDisplay();
+    } else {
+        requestEngineStop();
+    }
 }
 
-function checkflip() {
-	clear_position();
-	display_position(board_pos);
+function checkOutput() {
+    const outputElement = document.getElementById("output");
+    outputElement.style.visibility = document.getElementById("checkbox_output").checked ? "visible" : "hidden";
 }
 
-let worker = null;
-let current_worker_fen = "";
-
-function request_engine_start() {
-	if (worker != null && current_worker_fen == board_pos.get_fen()) return;
-	
-	request_engine_stop();
-	worker = new Worker("worker.js");
-	worker.onmessage = function(event) {
-		document.getElementById("output").innerHTML = event.data + "<br>" + 	document.getElementById("output").innerHTML;
-	}
-	worker.postMessage({status: "start", fen: board_pos.get_fen()});
-	current_worker_fen = board_pos.get_fen();
+function checkPlayMode() {
+    const playChecked = document.getElementById("checkbox_play").checked;
+    ["checkbox_arrow", "checkbox_think", "checkbox_output", "checkbox_flip", "fen"].forEach(id => {
+        document.getElementById(id).style.visibility = playChecked ? "hidden" : "visible";
+    });
+    if (playChecked) {
+        document.getElementById("checkbox_think").checked = true;
+        document.getElementById("checkbox_arrow").checked = true;
+        checkArrowDisplay();
+        checkEngineThinking();
+        if (!isUserTurn()) {
+            setTimeout(playLoop, parseInt(document.getElementById("thinktime").value));
+        }
+    } else {
+        checkOutput();
+        checkEngineThinking();
+        checkArrowDisplay();
+    }
 }
 
-function request_engine_newpos() {
-	if (document.getElementById("checkbox_think").checked) {
-		request_engine_start();
-	}
-	//worker.postMessage({status: "newpos", fen: board_pos.get_fen()});
+function playLoop() {
+    if (document.getElementById("checkbox_play").checked && !isUserTurn()) {
+        const moveString = getLastEngineStat("bestmove");
+        executeMove(moveString);
+    }
 }
 
-function request_engine_updpos() {
-	if (document.getElementById("checkbox_think").checked) {
-		request_engine_start();
-	}
-	//worker.postMessage({status: "update", fen: board_pos.get_fen()});
+function checkFlip() {
+    clearBoard();
+    displayBoardPosition(boardPosition);
 }
 
-function request_engine_stop() {
-	if (worker != null) worker.terminate();
-	worker = null;
+let engineWorker = null;
+let currentWorkerFen = "";
+
+function requestEngineStart() {
+	return
+    if (engineWorker !== null && currentWorkerFen === boardPosition.get_fen()) return;
+    requestEngineStop();
+    engineWorker = new Worker("worker.js");
+    engineWorker.onmessage = function(event) {
+        document.getElementById("output").innerHTML = event.data + "<br>" + document.getElementById("output").innerHTML;
+    }
+    engineWorker.postMessage({ status: "start", fen: boardPosition.get_fen() });
+    currentWorkerFen = boardPosition.get_fen();
 }
 
+function requestNewEnginePosition() {
+	return
+    if (document.getElementById("checkbox_think").checked) {
+        requestEngineStart();
+    }
+}
+
+function updateEnginePosition() {
+	return
+    if (document.getElementById("checkbox_think").checked) {
+        requestEngineStart();
+    }
+}
+
+function requestEngineStop() {
+	return
+    if (engineWorker !== null) engineWorker.terminate();
+    engineWorker = null;
+}
