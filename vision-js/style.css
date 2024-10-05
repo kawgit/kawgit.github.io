@@ -26,7 +26,7 @@ h3 {
     display: flex;
     width: 90vw;
     max-width: 1200px;
-    height: 80vh;
+    height: 85vh;
     gap: 20px;
 }
 
@@ -46,16 +46,14 @@ h3 {
 .board-container {
     display: inline-block; /* or 'block' if you want it to span the full width */
     padding: 10px; /* Optional: adjust padding to your needs */
-    border: 1px solid #ccc; /* Optional: gives it a border */
-    width: auto; /* Automatically adjust based on content */
     max-width: 100%; /* Optional: prevents the container from growing beyond a certain limit */
     box-sizing: border-box; /* Includes padding and border in the element’s total width/height */
 }
 
 /* Chessboard Styling */
 .board {
-    width: 60vw;
-    height: 60vw;
+    width: min(80vw, 80vh);
+    height: min(80vw, 80vh);
     background: purple;
     position: relative;
     overflow: hidden; /* Ensure the board's content remains inside */
@@ -66,13 +64,11 @@ h3 {
     width: 12.5%;
     height: 12.5%;
     position: absolute;
-}
-
-.piece {
-    cursor: grab;
+    object-fit: contain;
 }
 
 .grabbed {
+    object-fit: contain; /* Prevents distortion when the piece is grabbed */
     cursor: grabbing; /* Indicates the piece is being dragged */
     z-index: 1000; /* Ensures it's above other elements */
     position: fixed; /* Removes the piece from the document flow and positions it relative to the viewport */
@@ -141,15 +137,7 @@ label {
     color: #b9bbbe;
     font-size: 14px;
     height: 150px;
-    overflow-y: auto;
-}
-
-/* Scrollbar Styling */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-thumb {
-    background-color: #7289da;
-    border-radius: 5px;
+    overflow-y: auto; /* Keep the vertical scrollbar */
+    overflow-x: auto; /* Add a horizontal scrollbar for long lines */
+    white-space: nowrap; /* Prevent word wrapping and keep the text in one line */
 }

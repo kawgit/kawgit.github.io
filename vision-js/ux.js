@@ -213,9 +213,11 @@ function checkOutput() {
 
 function checkPlayMode() {
     const playChecked = document.getElementById("checkbox_play").checked;
+    
     ["checkbox_arrow", "checkbox_think", "checkbox_output", "checkbox_flip", "fen"].forEach(id => {
         document.getElementById(id).style.visibility = playChecked ? "hidden" : "visible";
     });
+
     if (playChecked) {
         document.getElementById("checkbox_think").checked = true;
         document.getElementById("checkbox_arrow").checked = true;
@@ -247,7 +249,6 @@ let engineWorker = null;
 let currentWorkerFen = "";
 
 function requestEngineStart() {
-	return
     if (engineWorker !== null && currentWorkerFen === boardPosition.get_fen()) return;
     requestEngineStop();
     engineWorker = new Worker("worker.js");
@@ -259,21 +260,18 @@ function requestEngineStart() {
 }
 
 function requestNewEnginePosition() {
-	return
     if (document.getElementById("checkbox_think").checked) {
         requestEngineStart();
     }
 }
 
 function updateEnginePosition() {
-	return
     if (document.getElementById("checkbox_think").checked) {
         requestEngineStart();
     }
 }
 
 function requestEngineStop() {
-	return
     if (engineWorker !== null) engineWorker.terminate();
     engineWorker = null;
 }
