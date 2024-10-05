@@ -1,124 +1,43 @@
-let boardElement = document.getElementById("board");
-let boardPosition = new Pos();
+let board;
+let pos = new Pos();
+let checkedFlip = false;
+let checkedPlayMode = true;
+let checkedThink = false;
+let checkedArrow = false;
+let checkedOutput = true;
+let fen = "";
+let thinkTime = 3000; // User changed thinkTime to 3000
+let engineWorker = null;
+let currentWorkerFen = "";
 
-function isUserTurn() {
-    const flipChecked = document.getElementById("checkbox_flip").checked;
-    return (!flipChecked && boardPosition.turn === WHITE) ||
-           (flipChecked && boardPosition.turn === BLACK);
-}
-
-function undoMove() {
-    if (boardPosition.move_log.length !== 0) {
-        boardPosition.undo_move();
-        if (document.getElementById("checkbox_play").checked && !isUserTurn()) {
-            boardPosition.undo_move();
-        }
-        clearBoard();
-        displayBoardPosition(boardPosition);
-        updateEnginePosition();
-    }
+function updateSettings() {
+    checkedFlip = document.getElementById("checkboxFlip").checked;
+    checkedPlayMode = document.getElementById("checkboxPlayMode").checked;
+    checkedThink = document.getElementById("checkboxThink").checked;
+    checkedArrow = document.getElementById("checkboxArrow").checked;
+    checkedOutput = document.getElementById("checkboxOutput").checked;
+    fen = document.getElementById("fen").value;
+    thinkTime = parseInt(document.getElementById("thinktime").value, 10);
 }
 
 function getSquareElement(squareIndex) {
-    return document.getElementById("square" + (squareIndex + 1).toString().padStart(2, '0'));
+    return document.getElementById(`square${String(squareIndex + 1).padStart(2, '0')}`);
 }
 
 function placePieceOnSquare(element, squareIndex) {
     let col = squareIndex % 8;
     let row = Math.floor(squareIndex / 8);
-    if (document.getElementById("checkbox_flip").checked) {
+    if (checkedFlip) {
         row = 7 - row;
         col = 7 - col;
     }
-    element.style.marginLeft = (col / 8 * 100).toString() + "%";
-    element.style.marginTop = ((7 - row) / 8 * 100).toString() + "%";
+    element.style.marginLeft = `${(col / 8) * 100}%`;
+    element.style.marginTop = `${((7 - row) / 8) * 100}%`;
 }
 
-window.onload = function() {
-    boardElement = document.getElementById("board");
-
-    for (let i = 0; i < 64; i++) {
-        placePieceOnSquare(getSquareElement(i), i);
-    }
-
-    displayBoardPosition(boardPosition);
-    checkEngineThinking();
-    checkOutput();
-    checkArrowDisplay();
-    checkPlayMode();
-}
-
-function getPieceImagePath(piece) {
-    const pieceColor = (piece & WHITE) !== 0 ? "w" : "b";
-    return "pieces/" + pieceColor + piece_to_char.get(piece).toLowerCase() + ".png";
-}
-
-let fromRow = SQUARENONE;
-let fromCol = SQUARENONE;
-
-function highlightSquare(squareIndex, color = "yellow", id = "") {
-    let highlightElement = document.createElement("div");
-    highlightElement.classList.add("highlight");
-    highlightElement.style.background = color;
-    highlightElement.draggable = false;
-    highlightElement.id = id;
-    boardElement.appendChild(highlightElement);
-    placePieceOnSquare(highlightElement, squareIndex);
-}
-
-function executeMove(moveString) {
-    clearBoard();
-    boardPosition.do_str_move(moveString);
-    displayBoardPosition(boardPosition);
-    updateEnginePosition();
-    if (!isUserTurn()) {
-        setTimeout(playLoop, parseInt(document.getElementById("thinktime").value));
-    }
-}
-
-function dragPiece(pieceId) {
-    fromCol = Math.floor(parseFloat(document.getElementById(pieceId).style.marginLeft) / 100 * 8);
-    fromRow = 7 - Math.floor(parseFloat(document.getElementById(pieceId).style.marginTop) / 100 * 8);
-
-    if (document.getElementById("checkbox_flip").checked) {
-        fromRow = 7 - fromRow;
-        fromCol = 7 - fromCol;
-    }
-
-    let fromSquare = rc(fromRow, fromCol);
-    let legalMoves = boardPosition.get_legal_moves();
-
-    legalMoves.forEach(move => {
-        if (get_from(move) === fromSquare) {
-            let toSquare = get_to(move);
-            highlightSquare(toSquare);
-        }
-    });
-
-    const pieceElement = document.getElementById(pieceId);
-	
-    document.onmousemove = function(event) {
-		pieceElement.classList.add("grabbed");
-        pieceElement.style.marginLeft = Math.round(event.clientX - boardElement.getBoundingClientRect().left) + "px";
-        pieceElement.style.marginTop = Math.round(event.clientY - boardElement.getBoundingClientRect().top) + "px";
-    }
-
-    document.onmouseup = function(event) {
-        pieceElement.classList.remove("grabbed");
-        document.onmousemove = null;
-        document.onmouseup = null;
-
-        let toCol = Math.floor((event.clientX - boardElement.getBoundingClientRect().left) / parseInt(boardElement.getBoundingClientRect().width) * 8);
-        let toRow = 7 - Math.floor((event.clientY - boardElement.getBoundingClientRect().top) / parseInt(boardElement.getBoundingClientRect().height) * 8);
-
-        if (document.getElementById("checkbox_flip").checked) {
-            toRow = 7 - toRow;
-            toCol = 7 - toCol;
-        }
-
-        let toSquare = rc(toRow, toCol);
-        executeMove(get_sq_SAN(fromSquare) + get_sq_SAN(toSquare));
-    }
+function getPieceImage(piece) {
+    const color = (piece & WHITE) !== 0 ? "w" : "b";
+    return `pieces/${color}${piece_to_char.get(piece).toLowerCase()}.png`;
 }
 
 function clearBoard() {
@@ -126,152 +45,291 @@ function clearBoard() {
     document.querySelectorAll('.highlight').forEach(highlight => highlight.remove());
 }
 
-function displayBoardPosition(position) {
-	
-	for (let i = 0; i < 64; i++) {
-		let piece = position.mailboxes[i];
-        if (piece !== PIECENONE) {
-            let pieceElement = document.createElement("img");
-            pieceElement.src = getPieceImagePath(piece);
-            pieceElement.classList.add("piece");
-            pieceElement.id = "piece" + i.toString().padStart(2, '0');
-            pieceElement.onmousedown = function() {
-                dragPiece(this.id);
-            }
-            pieceElement.draggable = false;
-            boardElement.appendChild(pieceElement);
-            placePieceOnSquare(pieceElement, i);
+function drawPosition(position) {
+    for (let i = 0; i < 64; i++) {
+        const piece = position.mailboxes[i];
+        
+        if (piece === PIECENONE) {
+            continue;
         }
+        
+        const img = document.createElement("img");
+        img.src = getPieceImage(piece);
+        img.classList.add("piece");
+        img.id = `piece${String(i).padStart(2, '0')}`;
+        img.addEventListener('mousedown', dragPiece);
+        img.draggable = false;
+        board.appendChild(img);
+        placePieceOnSquare(img, i);
     }
 }
 
-function isValidFen(fen) {
-    const parts = fen.split(" ");
-    if (fen.split("/").length !== 8 || parts.length !== 6) return false;
+function highlight(squareIndex, color = "yellow", id = "") {
+    const svgns = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgns, "svg");
+    svg.setAttribute("viewBox", "0 0 100 100");
+    svg.classList.add("highlight");
+    if (id) svg.id = id;
+    const circle = document.createElementNS(svgns, "circle");
+    circle.setAttribute("cx", "50");
+    circle.setAttribute("cy", "50");
+    circle.setAttribute("r", "10");
+    circle.setAttribute("fill", color);
+    circle.setAttribute("opacity", "0.7");
+    svg.appendChild(circle);
+    board.appendChild(svg);
+    placePieceOnSquare(svg, squareIndex);
+}
 
-    for (let i = 0; i < fen.length; i++) {
-        const char = fen[i];
-        if (char === ' ') break;
-        if (char === '/' || (char >= '1' && char <= '8') || char_to_piece.get(char) != null) {
-            continue;
+function squareIndexToString(squareIndex) {
+    const file = 'abcdefgh'[squareIndex % 8];
+    const rank = (Math.floor(squareIndex / 8) + 1).toString();
+    return file + rank;
+}
+
+function stringToSquareIndex(squareString) {
+    const file = squareString.charCodeAt(0) - 'a'.charCodeAt(0);
+    const rank = parseInt(squareString.charAt(1), 10) - 1;
+    return rank * 8 + file;
+}
+
+function lastEngineOutput() {
+    const outputElement = document.getElementById("output");
+    return outputElement.innerHTML.split("<br>")[0];
+}
+
+function lastEngineStat(token) {
+    const output = lastEngineOutput().split(" ");
+    const index = output.indexOf(token);
+    if (index !== -1 && index + 1 < output.length) {
+        return output[index + 1];
+    }
+    return null;
+}
+
+function isUserTurn() {
+    return (!checkedFlip && pos.turn === WHITE) || (checkedFlip && pos.turn === BLACK);
+}
+
+function validFen(fenString) {
+    const parts = fenString.trim().split(/\s+/);
+    if (parts.length !== 6) return false;
+
+    const rows = parts[0].split('/');
+    if (rows.length !== 8) return false;
+
+    for (let row of rows) {
+        let count = 0;
+        for (let char of row) {
+            if (/[1-8]/.test(char)) {
+                count += parseInt(char, 10);
+            } else if (char_to_piece.has(char)) {
+                count += 1;
+            } else {
+                return false;
+            }
         }
-        return false;
+        if (count !== 8) return false;
     }
     return true;
 }
 
-function setBoardFen(fen) {
-    if (!isValidFen(fen)) return;
-    boardPosition = new Pos(fen);
+function setFen(fenString) {
+    if (!validFen(fenString)) return;
+    pos = new Pos(fenString);
     clearBoard();
-    displayBoardPosition(boardPosition);
-    requestNewEnginePosition();
+    drawPosition(pos);
+    requestEnginePosition();
 }
 
-function getLastEngineOutput() {
-    return document.getElementById("output").innerHTML.split("<br>")[0];
+function updateOutputVisibility() {
+    const outputElement = document.getElementById("output");
+    outputElement.style.visibility = checkedOutput ? "visible" : "hidden";
 }
 
-function getLastEngineStat(token) {
-    let output = getLastEngineOutput().split(" ");
-    return output[output.indexOf(token) + 1];
-}
+function updateArrowDisplay() {
+    document.getElementById('arrow_start')?.remove();
+    document.getElementById('arrow_end')?.remove();
 
-function strToSquare(squareString) {
-    return rc(squareString.charCodeAt(1) - 49, squareString.charCodeAt(0) - 97);
-}
-
-function checkArrowDisplay() {
-    ["arrow_start", "arrow_end"].forEach(id => {
-        const arrowElem = document.getElementById(id);
-        if (arrowElem) boardElement.removeChild(arrowElem);
-    });
-
-    if (document.getElementById("checkbox_think").checked && document.getElementById("checkbox_arrow").checked) {
-        if (!document.getElementById("checkbox_play").checked || !isUserTurn()) {
-            const moveString = getLastEngineStat("bestmove");
-            highlightSquare(strToSquare(moveString.substring(0, 2)), "red", "arrow_start");
-            highlightSquare(strToSquare(moveString.substring(2, 4)), "red", "arrow_end");
+    if (checkedThink && checkedArrow) {
+        if (!checkedPlayMode || !isUserTurn()) {
+            const moveString = lastEngineStat("bestmove");
+            if (moveString) {
+                const fromSquareIndex = stringToSquareIndex(moveString.substring(0, 2));
+                const toSquareIndex = stringToSquareIndex(moveString.substring(2, 4));
+                highlight(fromSquareIndex, "red", "arrow_start");
+                highlight(toSquareIndex, "red", "arrow_end");
+            }
         }
-        window.requestAnimationFrame(checkArrowDisplay);
+        window.requestAnimationFrame(updateArrowDisplay);
     }
 }
 
-function checkEngineThinking() {
-    if (document.getElementById("checkbox_think").checked) {
+function updateEngineThinking() {
+    if (checkedThink) {
         requestEngineStart();
-        checkArrowDisplay();
+        updateArrowDisplay();
     } else {
         requestEngineStop();
     }
 }
 
-function checkOutput() {
-    const outputElement = document.getElementById("output");
-    outputElement.style.visibility = document.getElementById("checkbox_output").checked ? "visible" : "hidden";
-}
-
-function checkPlayMode() {
-    const playChecked = document.getElementById("checkbox_play").checked;
-    
-    ["checkbox_arrow", "checkbox_think", "checkbox_output", "checkbox_flip", "fen"].forEach(id => {
-        document.getElementById(id).style.visibility = playChecked ? "hidden" : "visible";
+function updatePlayMode() {
+    const elementsToToggle = ["checkboxArrow", "checkboxThink", "checkboxOutput", "checkboxFlip", "fen"];
+    elementsToToggle.forEach(id => {
+        document.getElementById(id).style.visibility = checkedPlayMode ? "hidden" : "visible";
     });
 
-    if (playChecked) {
-        document.getElementById("checkbox_think").checked = true;
-        document.getElementById("checkbox_arrow").checked = true;
-        checkArrowDisplay();
-        checkEngineThinking();
+    if (checkedPlayMode) {
+        document.getElementById("checkboxThink").checked = true;
+        document.getElementById("checkboxArrow").checked = true;
+        updateSettings();
+        updateArrowDisplay();
+        updateEngineThinking();
         if (!isUserTurn()) {
-            setTimeout(playLoop, parseInt(document.getElementById("thinktime").value));
+            setTimeout(playLoop, thinkTime);
         }
     } else {
-        checkOutput();
-        checkEngineThinking();
-        checkArrowDisplay();
+        updateOutputVisibility();
+        updateEngineThinking();
+        updateArrowDisplay();
+    }
+}
+
+function executeMove(moveString) {
+    clearBoard();
+    pos.do_str_move(moveString);
+    drawPosition(pos);
+    requestEnginePosition();
+    if (!isUserTurn()) {
+        setTimeout(playLoop, thinkTime);
     }
 }
 
 function playLoop() {
-    if (document.getElementById("checkbox_play").checked && !isUserTurn()) {
-        const moveString = getLastEngineStat("bestmove");
-        executeMove(moveString);
+    if (checkedPlayMode && !isUserTurn()) {
+        const moveString = lastEngineStat("bestmove");
+        if (moveString) {
+            executeMove(moveString);
+        }
     }
 }
 
-function checkFlip() {
-    clearBoard();
-    displayBoardPosition(boardPosition);
+function dragPiece(event) {
+    const pieceElement = event.target;
+    let fromCol = Math.floor(parseFloat(pieceElement.style.marginLeft) / 100 * 8);
+    let fromRow = 7 - Math.floor(parseFloat(pieceElement.style.marginTop) / 100 * 8);
+
+    if (checkedFlip) {
+        fromRow = 7 - fromRow;
+        fromCol = 7 - fromCol;
+    }
+
+    const fromSquareIndex = fromRow * 8 + fromCol;
+    const legalMoves = pos.get_legal_moves();
+
+    legalMoves.forEach(moveEncoding => {
+        if (get_from(moveEncoding) === fromSquareIndex) {
+            const toSquareIndex = get_to(moveEncoding);
+            highlight(toSquareIndex);
+        }
+    });
+
+    function onMouseMove(event) {
+        pieceElement.classList.add("grabbed");
+        pieceElement.style.marginLeft = `${Math.round(event.clientX - board.getBoundingClientRect().left)}px`;
+        pieceElement.style.marginTop = `${Math.round(event.clientY - board.getBoundingClientRect().top)}px`;
+    }
+
+    function onMouseUp(event) {
+        pieceElement.classList.remove("grabbed");
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+
+        let toCol = Math.floor((event.clientX - board.getBoundingClientRect().left) / board.getBoundingClientRect().width * 8);
+        let toRow = 7 - Math.floor((event.clientY - board.getBoundingClientRect().top) / board.getBoundingClientRect().height * 8);
+
+        if (checkedFlip) {
+            toRow = 7 - toRow;
+            toCol = 7 - toCol;
+        }
+
+        const toSquareIndex = toRow * 8 + toCol;
+        const fromSquareString = squareIndexToString(fromSquareIndex);
+        const toSquareString = squareIndexToString(toSquareIndex);
+        executeMove(fromSquareString + toSquareString);
+    }
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
 }
 
-let engineWorker = null;
-let currentWorkerFen = "";
-
 function requestEngineStart() {
-    if (engineWorker !== null && currentWorkerFen === boardPosition.get_fen()) return;
+    const currentFen = pos.get_fen();
+    if (engineWorker !== null && currentWorkerFen === currentFen) return;
+
     requestEngineStop();
     engineWorker = new Worker("worker.js");
     engineWorker.onmessage = function(event) {
-        document.getElementById("output").innerHTML = event.data + "<br>" + document.getElementById("output").innerHTML;
-    }
-    engineWorker.postMessage({ status: "start", fen: boardPosition.get_fen() });
-    currentWorkerFen = boardPosition.get_fen();
-}
-
-function requestNewEnginePosition() {
-    if (document.getElementById("checkbox_think").checked) {
-        requestEngineStart();
-    }
-}
-
-function updateEnginePosition() {
-    if (document.getElementById("checkbox_think").checked) {
-        requestEngineStart();
-    }
+        const outputElement = document.getElementById("output");
+        outputElement.innerHTML = `${event.data}<br>${outputElement.innerHTML}`;
+    };
+    engineWorker.postMessage({ status: "start", fen: currentFen });
+    currentWorkerFen = currentFen;
 }
 
 function requestEngineStop() {
-    if (engineWorker !== null) engineWorker.terminate();
-    engineWorker = null;
+    if (engineWorker !== null) {
+        engineWorker.terminate();
+        engineWorker = null;
+    }
 }
+
+function requestEnginePosition() {
+    if (checkedThink) {
+        requestEngineStart();
+    }
+}
+
+window.addEventListener('load', function() {
+    board = document.getElementById("board");
+
+    for (let i = 0; i < 64; i++) {
+        placePieceOnSquare(getSquareElement(i), i);
+    }
+
+    drawPosition(pos);
+    updateEngineThinking();
+    updateOutputVisibility();
+    updateArrowDisplay();
+    updatePlayMode();
+
+    document.getElementById("checkboxFlip").addEventListener('change', function() {
+        updateSettings();
+        clearBoard();
+        drawPosition(pos);
+    });
+    document.getElementById("checkboxPlayMode").addEventListener('change', function() {
+        updateSettings();
+        updatePlayMode();
+    });
+    document.getElementById("checkboxThink").addEventListener('change', function() {
+        updateSettings();
+        updateEngineThinking();
+    });
+    document.getElementById("checkboxArrow").addEventListener('change', function() {
+        updateSettings();
+        updateArrowDisplay();
+    });
+    document.getElementById("checkboxOutput").addEventListener('change', function() {
+        updateSettings();
+        updateOutputVisibility();
+    });
+    document.getElementById("fen").addEventListener('input', function() {
+        updateSettings();
+        setFen(fen);
+    });
+    document.getElementById("thinktime").addEventListener('input', updateSettings);
+
+    updateSettings();
+});

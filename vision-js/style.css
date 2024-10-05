@@ -60,11 +60,16 @@ h3 {
 }
 
 .square,
-.piece {
+.piece,
+.highlight {
     width: 12.5%;
     height: 12.5%;
     position: absolute;
     object-fit: contain;
+}
+
+.piece {
+    transition: margin 0.3s ease-in-out;
 }
 
 .grabbed {
