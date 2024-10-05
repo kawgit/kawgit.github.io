@@ -1,0 +1,3 @@
+[submodule "Vision-JS"]
+	path = Vision-JS
+	url = https://github.com/kawgit/Vision-JS
