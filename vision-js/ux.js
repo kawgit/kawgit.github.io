@@ -6,7 +6,7 @@ let checkedThink = false;
 let checkedArrow = false;
 let checkedOutput = true;
 let fen = "";
-let thinkTime = 3000; // User changed thinkTime to 3000
+let thinkTime = 3000;
 let engineWorker = null;
 let currentWorkerFen = "";
 
@@ -24,7 +24,11 @@ function getSquareElement(squareIndex) {
     return document.getElementById(`square${String(squareIndex + 1).padStart(2, '0')}`);
 }
 
-function placePieceOnSquare(element, squareIndex) {
+function getPieceElement(squareIndex) {
+    return document.getElementById(`piece${String(squareIndex + 1).padStart(2, '0')}`);
+}
+
+function placeElementOnSquare(element, squareIndex) {
     let col = squareIndex % 8;
     let row = Math.floor(squareIndex / 8);
     if (checkedFlip) {
@@ -46,8 +50,8 @@ function clearBoard() {
 }
 
 function drawPosition(position) {
-    for (let i = 0; i < 64; i++) {
-        const piece = position.mailboxes[i];
+    for (let squareIndex = 0; squareIndex < 64; squareIndex++) {
+        const piece = position.mailboxes[squareIndex];
         
         if (piece === PIECENONE) {
             continue;
@@ -56,11 +60,11 @@ function drawPosition(position) {
         const img = document.createElement("img");
         img.src = getPieceImage(piece);
         img.classList.add("piece");
-        img.id = `piece${String(i).padStart(2, '0')}`;
+        img.id = `piece${String(squareIndex + 1).padStart(2, '0')}`;
         img.addEventListener('mousedown', dragPiece);
         img.draggable = false;
         board.appendChild(img);
-        placePieceOnSquare(img, i);
+        placeElementOnSquare(img, squareIndex);
     }
 }
 
@@ -78,7 +82,7 @@ function highlight(squareIndex, color = "yellow", id = "") {
     circle.setAttribute("opacity", "0.7");
     svg.appendChild(circle);
     board.appendChild(svg);
-    placePieceOnSquare(svg, squareIndex);
+    placeElementOnSquare(svg, squareIndex);
 }
 
 function squareIndexToString(squareIndex) {
@@ -197,12 +201,71 @@ function updatePlayMode() {
 }
 
 function doMove(moveString) {
-    clearBoard();
     pos.do_str_move(moveString);
-    drawPosition(pos);
+
     requestEnginePosition();
     if (!isUserTurn()) {
         setTimeout(playLoop, thinkTime);
+    }
+
+    if (!checkedPlayMode || !isUserTurn()) {
+        clearBoard();
+        drawPosition(pos);
+        return;
+    }
+
+    const moveEncoding = pos.move_log[pos.move_log.length - 1];
+
+    const fromSquareIndex = get_from(moveEncoding);
+    const toSquareIndex = get_to(moveEncoding);
+    const flags = get_flags(moveEncoding);
+
+    console.log(fromSquareIndex)
+
+    const fromPieceElement = getPieceElement(fromSquareIndex)
+    const toPieceElement = getPieceElement(toSquareIndex)
+
+    if (toPieceElement) {
+        toPieceElement.remove();
+    }
+
+    fromPieceElement.id = `piece${String(toSquareIndex).padStart(2, '0')}`;
+    placeElementOnSquare(fromPieceElement, toSquareIndex);
+
+    if (flags != F_QUIET) {
+        if (flags == F_EP) {
+            const victimSquareIndex = toSquareIndex + (this.turn == WHITE ? -8 : 8);
+            getPieceElement(victimSquareIndex).remove()
+        }
+        else if (flags == F_KINGCASTLE || flags == F_QUEENCASTLE) {
+            let rookFromSquareIndex;
+            let rookToSquareIndex;
+
+            if (flags == F_KINGCASTLE) {
+                if (this.turn == WHITE) {
+                    rookFromSquareIndex = 7;
+                    rookToSquareIndex = 5;
+                }
+                else {
+                    rookFromSquareIndex = 63;
+                    rookToSquareIndex = 61;
+                }
+            }
+            else {
+                if (this.turn == WHITE) {
+                    rookFromSquareIndex = 0;
+                    rookToSquareIndex = 3;
+                }
+                else {
+                    rookFromSquareIndex = 56;
+                    rookToSquareIndex = 59;
+                }
+            }
+
+            const rookElement = getPieceElement(rookFromSquareIndex);
+            rookElement.id = `piece${String(rookToSquareIndex).padStart(2, '0')}`;
+            placeElementOnSquare(rookElement, rookToSquareIndex)
+        }
     }
 }
 
@@ -295,7 +358,7 @@ window.addEventListener('load', function() {
     board = document.getElementById("board");
 
     for (let i = 0; i < 64; i++) {
-        placePieceOnSquare(getSquareElement(i), i);
+        placeElementOnSquare(getSquareElement(i), i);
     }
 
     drawPosition(pos);

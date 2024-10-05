@@ -322,7 +322,7 @@ class Pos {
 			i++;
 		}
 
-		fen = fen.substr(fen.indexOf(' ')+1, fen.length);
+		fen = fen.substring(fen.indexOf(' ')+1, fen.length);
 
 		if (fen.indexOf("w") == -1) {
 			this.turn = BLACK;
@@ -330,7 +330,7 @@ class Pos {
 			this.hashkey ^= turn_hash;
 		}
 
-		fen = fen.substr(fen.indexOf(' ')+1, fen.length);
+		fen = fen.substring(fen.indexOf(' ')+1, fen.length);
 
 		if (fen.indexOf("K") != -1) {
 			this.cr |= F_WKS;
@@ -349,7 +349,7 @@ class Pos {
 			this.hashkey ^= cr_hashes[I_BQS];
 		}
 
-		fen = fen.substr(fen.indexOf(' ')+1, fen.length);
+		fen = fen.substring(fen.indexOf(' ')+1, fen.length);
 
 		if (fen[0] != '-') {
 			let col = fen.charCodeAt(0)-97;
@@ -357,16 +357,13 @@ class Pos {
 			this.hashkey ^= ep_hashes[this.ep];
 		}
 
-		fen = fen.substr(fen.indexOf(' ')+1, fen.length);
+		fen = fen.substring(fen.indexOf(' ')+1, fen.length);
 
-		this.hm_clock = parseInt(fen.substr(0, fen.indexOf(' ')));
-		this.m_clock = parseInt(fen.substr(fen.indexOf(' ') + 1, fen.length));
-		
-		console.log(fen);
+		this.hm_clock = parseInt(fen.substring(0, fen.indexOf(' ')));
+		this.m_clock = parseInt(fen.substring(fen.indexOf(' ') + 1, fen.length));
 	}
 
 	set_piece(sq, pc) {
-		//console.log(get_sq_SAN(sq) + " set to " + piece_to_char.get(pc) + " " + pc.toString());
 
 		//update ledger
 
@@ -1182,7 +1179,7 @@ class TTEntry {
 class TT { //	transposition table
 	constructor(hashsize=16) {
 		if (hashsize > 31) {
-			console.log("WARNING: HASHSIZE > 31, NOT ALLOWED DUE TO MAX INT SIZE");
+			console.warn("HASHSIZE > 31, NOT ALLOWED DUE TO MAX INT SIZE");
 			hashsize = 31;
 		}
 		

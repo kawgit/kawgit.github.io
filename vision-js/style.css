@@ -44,10 +44,10 @@ h3 {
 }
 
 .board-container {
-    display: inline-block; /* or 'block' if you want it to span the full width */
-    padding: 10px; /* Optional: adjust padding to your needs */
-    max-width: 100%; /* Optional: prevents the container from growing beyond a certain limit */
-    box-sizing: border-box; /* Includes padding and border in the element’s total width/height */
+    display: inline-block;
+    padding: 10px;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 /* Chessboard Styling */
@@ -56,7 +56,7 @@ h3 {
     height: min(80vw, 80vh);
     background: purple;
     position: relative;
-    overflow: hidden; /* Ensure the board's content remains inside */
+    overflow: hidden;
 }
 
 .square,
@@ -69,7 +69,7 @@ h3 {
 }
 
 .piece {
-    transition: margin 0.3s ease-in-out;
+    transition: margin-left .3s ease-in-out, margin-top .3s ease-in-out;
 }
 
 .grabbed {
@@ -79,6 +79,7 @@ h3 {
     position: fixed; /* Removes the piece from the document flow and positions it relative to the viewport */
     pointer-events: none; /* Disables pointer interaction with other elements */
     transform: translate(-50%, -50%); /* Centers the element under the cursor */
+    transition: none !important; /* Ensure transitions are disabled during drag */
 }
 
 /* Chessboard Square Colors */
@@ -142,7 +143,7 @@ label {
     color: #b9bbbe;
     font-size: 14px;
     height: 150px;
-    overflow-y: auto; /* Keep the vertical scrollbar */
-    overflow-x: auto; /* Add a horizontal scrollbar for long lines */
-    white-space: nowrap; /* Prevent word wrapping and keep the text in one line */
+    overflow-y: auto;
+    overflow-x: auto;
+    white-space: nowrap;
 }

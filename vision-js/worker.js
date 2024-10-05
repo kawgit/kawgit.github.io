@@ -1,7 +1,6 @@
 importScripts("chess.js");
 
 onmessage = function(event) {
-  	console.log('Message received: ' + event.data.status + " fen: " + event.data.fen);
 	let root = new Pos(event.data.fen);
 	let tt = new TT(16);
 	tt.searching = true;
