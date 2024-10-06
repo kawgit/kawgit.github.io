@@ -110,7 +110,8 @@ body {
 
 picture,
 svg,
-img {
+img,
+video {
   display: block;
   max-inline-size: 100%;
   object-fit: contain;
@@ -306,13 +307,14 @@ body.light .btn-cta:focus {
 }
 
 .link {
-  display: inline-block;
+  display: inline-flex;
   font-weight: 600;
   font-size: var(--text-small);
   padding: var(--gutter-nano) 0;
   text-decoration: none;
   color: var(--important);
   position: relative;
+  gap: 8px;
 }
 
 .link::after,
@@ -660,6 +662,11 @@ body.light .logo {
 
 body.light .work-img {
   box-shadow: var(--shadow);
+}
+
+.work-img video {
+  aspect-ratio: 16 / 9; /* Adjust the ratio as needed */
+  object-fit: cover;    /* Or 'contain' based on your preference */
 }
 
 .work-textbox {

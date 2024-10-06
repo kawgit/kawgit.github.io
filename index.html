@@ -198,9 +198,17 @@
 
                 <div class="work-links">
                   <!-- Add url of project in href attribute -->
-                  <a href="../Vision-JS/index.html" target="_blank" rel="noopener" class="link"
-                    >Play with the demo</a
+                  <a class="link" href="../Vision-JS/index.html" target="_blank" rel="noopener"
+                    >Play the demo</a
                   >
+                  <a class="link" href="https://github.com/kawgit/Vision-JS" target="_blank" rel="noopener">
+                    <img
+                      src="assets/images/social-links/github.svg"
+                      alt="GitHub"
+                      loading="lazy"
+                      class="icon"
+                    />
+                  </a>
                 </div>
 
                 <p class="work-text"></p>
@@ -208,36 +216,39 @@
                 </p>
 
                 <div class="work-links">
-                  <!-- Add link to project source code in href attribute if applicable otherwise feel free to delete or comment the markup -->
-                  <a
-                    href="https://github.com/kawgit/Vision-Chess"
-                    target="_blank"
-                    rel="noopener"
-                    title="Source code"
-                  >
+                  <a class="link" href="https://github.com/kawgit/Vision-Chess" target="_blank" rel="noopener">
                     <img
                       src="assets/images/social-links/github.svg"
                       alt="GitHub"
                       loading="lazy"
+                      class="icon"
                     />
                   </a>
                 </div>
               </div>
 
-         <!-- Update img src and alt attribute  -->
-
-              <picture class="work-img">
-                <img
+              <div class="work-img">
+                <video
                   loading="lazy"
-                  src="assets/images/work/vision-chess.webp"
-                  alt="agency elevation"
-                />
-              </picture>
+                  preload="metadata"
+                  poster="assets/images/work/vision-chess.png"
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  width="100%"
+                  height="auto"
+                >
+                  <source src="assets/images/work/vision-chess.webm" type="video/webm" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+              
             </div>
             <div class="work-box">
               <div class="work-textbox">
                 <!-- Add your project title here -->
-                <h3 class="h3">agencyelevation.com</h3>
+                <h3 class="h3">3d-Model-Render</h3>
                 <!-- Add small description of your project  -->
 
                 <p class="work-text">Website for Agency Elevation.</p>
