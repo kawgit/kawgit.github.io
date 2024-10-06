@@ -1,3 +1,6 @@
 [submodule "Vision-JS"]
 	path = Vision-JS
 	url = https://github.com/kawgit/Vision-JS
+[submodule "3D-Model-Renderer"]
+	path = 3D-Model-Renderer
+	url = https://github.com/kawgit/3D-Model-Renderer
