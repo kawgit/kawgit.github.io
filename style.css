@@ -664,11 +664,6 @@ body.light .work-img {
   box-shadow: var(--shadow);
 }
 
-.work-img video {
-  aspect-ratio: 16 / 9; /* Adjust the ratio as needed */
-  object-fit: cover;    /* Or 'contain' based on your preference */
-}
-
 .work-textbox {
   max-inline-size: 445px;
 }
