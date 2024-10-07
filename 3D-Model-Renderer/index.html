@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SNJHNEYP5B"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-SNJHNEYP5B');
+    </script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>3D Model Renderer</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <div class="main-container">
+        <div class="header">
+            <h1>3D Model Renderer</h1>
+            <div class="status">
+                <span>FPS: <f id="fps_count"></f></span>
+                <span>Running: <input type="checkbox" id="running" checked="true"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="column canvas-column">
+                <canvas id="canvas" width="1280" height="720"></canvas>
+            </div>
+            <div class="column side-panel">
+                <h3>Models</h3>
+                <button onclick="launch_scene('bear.obj')">Bear</button>
+                <button onclick="launch_scene('cow.obj')">Cow</button>
+                <button onclick="launch_scene('pumpkin.obj')">Pumpkin</button>
+                <button onclick="launch_scene('sphere.obj')">Sphere</button>
+                <button onclick="launch_scene('teapot.obj')">Teapot</button>
+                <h3>Directions</h3>
+                <p>Use WASD to move the camera horizontally, EQ to move up and down, and IJKL to pan the camera.</p>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>

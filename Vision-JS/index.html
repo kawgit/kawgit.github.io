@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-SNJHNEYP5B"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		gtag('js', new Date());
+
+		gtag('config', 'G-SNJHNEYP5B');
+	</script>
+
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Vision Chess Online</title>
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+	<link href="style.css" rel="stylesheet">
+	<script src="chess.js"></script>
+	<script src="ux.js"></script>
+</head>
+
+<body>
+	<div class="container">
+		<div class="tab settings">
+			<h3>Board Settings (temporarily disabled with recent code changes)</h3>
+			<div class="setting-item" checked style="visibility: hidden;">
+				<input id="checkboxFlip" type="checkbox">
+				<label for="checkboxFlip">Flip board</label>
+			</div>
+			<div class="setting-item" style="visibility: hidden;">
+				<button onclick="ux_undo()">Undo Move</button>
+			</div>
+			<div class="setting-item" style="visibility: hidden;">
+				<label for="fen">FEN:</label>
+				<input id="fen" type="text" onchange="set_board_fen(this.value)" style="visibility: hidden;">
+			</div>
+			<h3>Engine Settings</h3>
+			<div class="setting-item">
+				<label for="thinktime">Think time (ms):</label>
+				<input id="thinktime" type="number" value="3000">
+			</div>
+			<div class="setting-item">
+				<input id="checkboxPlayMode" type="checkbox" checked>
+				<label for="checkboxPlayMode">Play mode</label>
+			</div>
+			<div class="setting-item">
+				<input id="checkboxThink" type="checkbox">
+				<label for="checkboxThink">Think</label>
+			</div>
+			<div class="setting-item">
+				<input id="checkboxArrow" type="checkbox">
+				<label for="checkboxArrow">Show best move</label>
+			</div>
+			<div class="setting-item">
+				<input id="checkboxOutput" type="checkbox" checked>
+				<label for="checkboxOutput">Show engine output</label>
+			</div>
+			<div class="output">
+				<p>Engine Output</p>
+				<div id="output"></div>
+			</div>
+		</div>
+		<div class="tab board-container">
+			<div class="board" id="board">
+				<div class="square dark" id="square01"></div>
+				<div class="square light" id="square02"></div>
+				<div class="square dark" id="square03"></div>
+				<div class="square light" id="square04"></div>
+				<div class="square dark" id="square05"></div>
+				<div class="square light" id="square06"></div>
+				<div class="square dark" id="square07"></div>
+				<div class="square light" id="square08"></div>
+				<div class="square light" id="square09"></div>
+				<div class="square dark" id="square10"></div>
+				<div class="square light" id="square11"></div>
+				<div class="square dark" id="square12"></div>
+				<div class="square light" id="square13"></div>
+				<div class="square dark" id="square14"></div>
+				<div class="square light" id="square15"></div>
+				<div class="square dark" id="square16"></div>
+				<div class="square dark" id="square17"></div>
+				<div class="square light" id="square18"></div>
+				<div class="square dark" id="square19"></div>
+				<div class="square light" id="square20"></div>
+				<div class="square dark" id="square21"></div>
+				<div class="square light" id="square22"></div>
+				<div class="square dark" id="square23"></div>
+				<div class="square light" id="square24"></div>
+				<div class="square light" id="square25"></div>
+				<div class="square dark" id="square26"></div>
+				<div class="square light" id="square27"></div>
+				<div class="square dark" id="square28"></div>
+				<div class="square light" id="square29"></div>
+				<div class="square dark" id="square30"></div>
+				<div class="square light" id="square31"></div>
+				<div class="square dark" id="square32"></div>
+				<div class="square dark" id="square33"></div>
+				<div class="square light" id="square34"></div>
+				<div class="square dark" id="square35"></div>
+				<div class="square light" id="square36"></div>
+				<div class="square dark" id="square37"></div>
+				<div class="square light" id="square38"></div>
+				<div class="square dark" id="square39"></div>
+				<div class="square light" id="square40"></div>
+				<div class="square light" id="square41"></div>
+				<div class="square dark" id="square42"></div>
+				<div class="square light" id="square43"></div>
+				<div class="square dark" id="square44"></div>
+				<div class="square light" id="square45"></div>
+				<div class="square dark" id="square46"></div>
+				<div class="square light" id="square47"></div>
+				<div class="square dark" id="square48"></div>
+				<div class="square dark" id="square49"></div>
+				<div class="square light" id="square50"></div>
+				<div class="square dark" id="square51"></div>
+				<div class="square light" id="square52"></div>
+				<div class="square dark" id="square53"></div>
+				<div class="square light" id="square54"></div>
+				<div class="square dark" id="square55"></div>
+				<div class="square light" id="square56"></div>
+				<div class="square light" id="square57"></div>
+				<div class="square dark" id="square58"></div>
+				<div class="square light" id="square59"></div>
+				<div class="square dark" id="square60"></div>
+				<div class="square light" id="square61"></div>
+				<div class="square dark" id="square62"></div>
+				<div class="square light" id="square63"></div>
+				<div class="square dark" id="square64"></div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>
