@@ -1255,3 +1255,20 @@ input:checked {
   --thumb-position: 100%;
   background-color: var(--track-active);
 }
+
+.client-logos {
+  display: flex; /* Switch back to flexbox layout */
+  justify-content: center; /* Center the logos */
+  align-items: center; /* Align logos vertically if they have different heights */
+  gap: var(--gutter-large); /* Maintain spacing between logos */
+  padding-block-start: var(--gutter-large); /* Maintain padding */
+}
+
+.client-logo {
+  flex: 1 1 auto; /* Allow logos to grow and shrink based on the container size */
+  max-width: 45%; /* Ensure logos take up to 45% of the available width each */
+  height: auto; /* Maintain aspect ratio */
+  margin: 0 auto; /* Center logos horizontally */
+  object-fit: contain; /* Scale logos while preserving aspect ratio */
+}
+
